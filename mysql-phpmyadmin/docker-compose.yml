@@ -1,0 +1,36 @@
+# Use root/example as user/password credentials
+version: '3'
+networks:
+  app_net_two:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+services:
+
+  database:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    networks:
+      app_net_two:
+        ipv4_address: 10.0.2.10
+
+  admin_db:
+    depends_on: 
+      - database
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: root  # password also root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    networks:
+      app_net_two:
+        ipv4_address: 10.0.2.20
